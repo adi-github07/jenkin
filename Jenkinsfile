@@ -1,22 +1,28 @@
 pipeline {
   agent any
 
-  environment {
-    ENV = "${env.JOB_NAME.contains('/prod/') ? 'prod' :
-           env.JOB_NAME.contains('/test/') ? 'test' : 'dev'}"
-  }
-
   stages {
+
     stage('Detect Environment') {
       steps {
-        echo "Job Name: ${env.JOB_NAME}"
-        echo "Detected ENV: ${ENV}"
+        script {
+          if (env.JOB_NAME.contains('/prod/')) {
+            env.ENV = 'prod'
+          } else if (env.JOB_NAME.contains('/test/')) {
+            env.ENV = 'test'
+          } else {
+            env.ENV = 'dev'
+          }
+        }
+
+        echo "Job Name     : ${env.JOB_NAME}"
+        echo "Detected ENV : ${env.ENV}"
       }
     }
 
     stage('Prod Approval') {
       when {
-        expression { ENV == 'prod' }
+        expression { env.ENV == 'prod' }
       }
       steps {
         input message: 'Approve PROD execution?'
@@ -25,7 +31,7 @@ pipeline {
 
     stage('Dummy Step') {
       steps {
-        echo "Running pipeline in ${ENV} environment"
+        echo "Running pipeline in ${env.ENV} environment"
       }
     }
   }
