@@ -7,25 +7,25 @@ pipeline {
   }
 
   stages {
-    stage('Show Environment') {
+    stage('Detect Environment') {
       steps {
-        echo "Job Name  : ${env.JOB_NAME}"
-        echo "ENV picked: ${ENV}"
+        echo "Job Name: ${env.JOB_NAME}"
+        echo "Detected ENV: ${ENV}"
       }
     }
 
-    stage('Approval (Prod only)') {
+    stage('Prod Approval') {
       when {
         expression { ENV == 'prod' }
       }
       steps {
-        input message: "Approve PROD deployment?"
+        input message: 'Approve PROD execution?'
       }
     }
 
-    stage('Dummy Deploy') {
+    stage('Dummy Step') {
       steps {
-        echo "Deploying to ${ENV} environment"
+        echo "Running pipeline in ${ENV} environment"
       }
     }
   }
